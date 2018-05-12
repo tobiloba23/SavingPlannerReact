@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+- "stable"
+
+env:
+- DB=pgsql
+- NODE_ENV=test
+
+services:
+- postgresql
+
+before_script:
+- psql -c 'create database more_recipes_test;' -U postgres
+- psql -c "CREATE ROLE TOBI WITH LOGIN PASSWORD 'password';" -U postgres
+- psql -c 'GRANT ALL PRIVILEGES ON DATABASE more_recipes_test TO TOBI;' -U postgres
+- sequelize db:migrate
+
+after_success:
+- npm run coveralls
+
+notifications:
+  email:
+    on_failure: change
